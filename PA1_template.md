@@ -1,20 +1,15 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 To load input data from a zip file from the current R working directory the following commands are used:
 
-```{r,echo=TRUE}
+
+```r
 setwd("D:/Falco/Data Science/repres/RepData_PeerAssessment1")
 data <- read.csv(file="activity.csv")
 # convert date to date data type
 data$date <- as.Date(data$date) 
-
 ```
 
 
@@ -26,7 +21,8 @@ The steps to be performed in this task are:
 - Plot a histogram of the total number of steps taken each day
 - Report the mean and median total number of steps taken per day
 
-```{r,echo=TRUE}
+
+```r
 clean.data <- na.omit(data) 
 # sum steps by date
 daily.steps <- rowsum(clean.data$steps, format(clean.data$date, '%Y-%m-%d')) 
@@ -42,8 +38,24 @@ mea<-mean(daily.steps$steps)
 med<-median(daily.steps$steps)
 abline(v=mea)
 abline(v=med)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 mea
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 med
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -57,7 +69,8 @@ The following steps are performed:
 - Plot time series of the 5-minute interval and the average number of steps taken, averaged across all days
 
 
-```{r,echo=TRUE}
+
+```r
 library(plyr)
 # Calculate average steps for each of 5-minute interval during a 24-hour period
 interval.mean.steps <- ddply(clean.data,~interval, summarise, mean=mean(steps))
@@ -68,12 +81,19 @@ qplot(x=interval, y=mean, data = interval.mean.steps,  geom = "line",
       ylab="Number of Steps",
       main="Average Number of Steps Taken Averaged Across All Days"
       )
-
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 The interval with the maximum number of steps is calculated as follows:
-```{r,echo=TRUE}
+
+```r
 interval.mean.steps[which.max(interval.mean.steps$mean), ]
+```
+
+```
+##     interval     mean
+## 104      835 206.1698
 ```
 The interval is apprimately that occurring at 8:35-8:40 a.m. .
 
@@ -87,10 +107,17 @@ Note that there are a number of days/intervals where there are missing values (c
 - Calculate and report the mean and median total number of steps taken per day.
 - Make following comments: Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r,echo=TRUE}
+
+```r
 nasnum <- sum(is.na(data$steps))
 nasnum
+```
 
+```
+## [1] 2304
+```
+
+```r
 # Find the NA positions
 na_pos <- which(is.na(data$steps))
 
@@ -102,7 +129,13 @@ data[na_pos, "steps"] <- mean_vec
 
 nasnum <- sum(is.na(data$steps))
 nasnum
+```
 
+```
+## [1] 0
+```
+
+```r
 # sum steps by date
 daily.steps <- rowsum(data$steps, format(data$date, '%Y-%m-%d')) 
 daily.steps <- data.frame(daily.steps) 
@@ -117,9 +150,24 @@ mea<-mean(daily.steps$steps)
 med<-median(daily.steps$steps)
 abline(v=mea)
 abline(v=med)
-mea
-med
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+```r
+mea
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+med
+```
+
+```
+## [1] 10766.19
 ```
 
 Q: Do these values (mean and median) differ from the estimates from the first part of the assignment? 
@@ -131,7 +179,8 @@ A: The frequency of the bin where the mean is contained increased as expected, w
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r,echo=TRUE}
+
+```r
 data$weektime <- as.factor(ifelse(weekdays(data$date) %in% 
                 c("sabato","domenica"),"weekend", "weekday"))
 
@@ -146,8 +195,8 @@ xyplot(mean_steps ~ interval |factor(type), data = mean.stp, type = "l", main="A
        \nAveraged Across All Weekday Days or Weekend Days",
        xlab="5-Minute Interval",
        ylab="Average Number of Steps Taken")
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 Activity during weekends is more evenly ditributed throughout the different day times.
